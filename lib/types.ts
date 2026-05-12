@@ -2,7 +2,8 @@ export interface Meal {
   id: string;
   name: string;
   description: string;
-  category: MealCategory;
+  detailedDescription?: string;
+  tags: string[];
   calories: number;
   protein: number;
   carbs: number;
@@ -11,11 +12,11 @@ export interface Meal {
   image: string;
 }
 
-export type MealCategory = "calorie-smart" | "high-protein" | "gluten-free" | "healthy";
+export type MealTag = "calorie-smart" | "high-protein" | "gluten-free" | "healthy" | "low-carb" | "keto";
 
 export type Goal = "improve-health" | "weight-loss" | "muscle-gain" | "save-time";
 
-export type MealPreference = MealCategory;
+export type MealPreference = MealTag;
 
 export type AvoidIngredient = "tuna" | "pork";
 

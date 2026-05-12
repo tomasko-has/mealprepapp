@@ -1,4 +1,7 @@
+import Image from "next/image";
+import Link from "next/link";
 import { Meal } from "@/lib/types";
+import { TAG_COLORS, formatTagLabel } from "@/lib/tag-utils";
 
 interface MealCardProps {
   meal: Meal;
@@ -8,30 +11,21 @@ interface MealCardProps {
 }
 
 export default function MealCard({ meal, onSelect, selected, showSelect }: MealCardProps) {
-  const categoryColors: Record<string, string> = {
-    "calorie-smart": "bg-blue-100 text-blue-700",
-    "high-protein": "bg-orange-100 text-orange-700",
-    "gluten-free": "bg-purple-100 text-purple-700",
-    healthy: "bg-green-100 text-green-700",
-  };
-
-  const categoryLabel = meal.category
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
-  return (
+  const card = (
     <div
-      className={`bg-white rounded-2xl overflow-hidden border-2 transition-all hover:shadow-lg ${
+      className={`bg-white rounded-2xl overflow-hidden border-2 transition-all hover:shadow-lg cursor-pointer ${
         selected ? "border-primary shadow-lg" : "border-gray-100"
       }`}
     >
-      <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
         {meal.image ? (
-          <img
+          <Image
             src={meal.image}
             alt={meal.name}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            quality={90}
+            className="object-cover"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400">
@@ -40,22 +34,28 @@ export default function MealCard({ meal, onSelect, selected, showSelect }: MealC
             </svg>
           </div>
         )}
-        <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${categoryColors[meal.category] || "bg-gray-100 text-gray-700"}`}>
-          {categoryLabel}
-        </span>
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-base mb-1">{meal.name}</h3>
-        <p className="text-gray-500 text-sm mb-3 line-clamp-2">{meal.description}</p>
-        <div className="flex items-center gap-3 text-xs text-gray-500">
-          <span className="font-semibold text-gray-900">{meal.calories} cal</span>
-          <span>P: {meal.protein}g</span>
-          <span>C: {meal.carbs}g</span>
-          <span>F: {meal.fat}g</span>
-        </div>
+        <h3 className="font-bold text-gray-900 text-base">{meal.name}</h3>
+        <p className="text-gray-500 text-sm mt-1 line-clamp-2">{meal.description}</p>
+        {meal.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {meal.tags.map((tag) => (
+              <span
+                key={tag}
+                className={`px-2.5 py-1 rounded-full text-xs font-semibold ${TAG_COLORS[tag] || "bg-gray-100 text-gray-700"}`}
+              >
+                {formatTagLabel(tag)}
+              </span>
+            ))}
+          </div>
+        )}
         {showSelect && (
           <button
-            onClick={onSelect}
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect?.();
+            }}
             className={`mt-3 w-full py-2 rounded-full text-sm font-semibold transition-colors ${
               selected
                 ? "bg-primary text-white"
@@ -67,5 +67,15 @@ export default function MealCard({ meal, onSelect, selected, showSelect }: MealC
         )}
       </div>
     </div>
+  );
+
+  if (showSelect) {
+    return card;
+  }
+
+  return (
+    <Link href={`/menu/${meal.id}`}>
+      {card}
+    </Link>
   );
 }

@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { MEALS } from "@/lib/data";
 import MealCard from "./meal-card";
+import type { Meal } from "@/lib/types";
 
-export default function MealPreview() {
-  const featured = MEALS.slice(0, 4);
+export default function MealPreview({ meals }: { meals: Meal[] }) {
+  const featured = meals.slice(0, 4);
 
   return (
     <section className="py-20 bg-gray-50">
@@ -16,11 +16,15 @@ export default function MealPreview() {
             Chef-prepared meals, fresh every week
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featured.map((meal) => (
-            <MealCard key={meal.id} meal={meal} />
-          ))}
-        </div>
+        {featured.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featured.map((meal) => (
+              <MealCard key={meal.id} meal={meal} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-400">No meals available yet.</p>
+        )}
         <div className="text-center mt-10">
           <Link
             href="/menu"

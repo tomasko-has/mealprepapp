@@ -7,8 +7,13 @@ import {
   GOALS_OPTIONS,
   PREFERENCE_OPTIONS,
   AVOID_OPTIONS,
-  PRICING,
 } from "@/lib/data";
+
+// TODO: fetch from Shopify selling plans
+const PRICING = {
+  standardPerMeal: 0,
+  flexiblePerMeal: 0,
+};
 import type {
   Goal,
   MealPreference,
@@ -76,7 +81,7 @@ export default function GetStartedPage() {
   }
 
   return (
-    <div className="min-h-[80vh] bg-gray-50 py-12">
+    <div className="min-h-[80vh] bg-[#e8e8e4] py-12">
       <div className="max-w-3xl mx-auto px-4">
         <StepIndicator currentStep={step} totalSteps={6} labels={STEP_LABELS} />
 

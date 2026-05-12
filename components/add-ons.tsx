@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ADD_ONS } from "@/lib/data";
+import type { AddOn } from "@/lib/types";
 
-export default function AddOns() {
+export default function AddOns({ addOns }: { addOns: AddOn[] }) {
   const [selected, setSelected] = useState<Record<string, number>>({});
 
-  const breakfasts = ADD_ONS.filter((a) => a.category === "breakfast");
-  const snacks = ADD_ONS.filter((a) => a.category === "snack");
+  const breakfasts = addOns.filter((a) => a.category === "breakfast");
+  const snacks = addOns.filter((a) => a.category === "snack");
 
   function increment(id: string) {
     setSelected((s) => ({ ...s, [id]: (s[id] || 0) + 1 }));
@@ -26,11 +26,11 @@ export default function AddOns() {
   }
 
   const totalAddOnPrice = Object.entries(selected).reduce((sum, [id, qty]) => {
-    const addon = ADD_ONS.find((a) => a.id === id);
+    const addon = addOns.find((a) => a.id === id);
     return sum + (addon ? addon.price * qty : 0);
   }, 0);
 
-  function renderAddOnCard(addon: (typeof ADD_ONS)[number]) {
+  function renderAddOnCard(addon: AddOn) {
     const qty = selected[addon.id] || 0;
     return (
       <div
@@ -79,6 +79,10 @@ export default function AddOns() {
     );
   }
 
+  if (addOns.length === 0) {
+    return null;
+  }
+
   return (
     <section className="mt-16">
       <div className="flex items-center justify-between mb-6">
@@ -95,15 +99,23 @@ export default function AddOns() {
         )}
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Breakfast</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {breakfasts.map(renderAddOnCard)}
-      </div>
+      {breakfasts.length > 0 && (
+        <>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Breakfast</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {breakfasts.map(renderAddOnCard)}
+          </div>
+        </>
+      )}
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Snacks</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {snacks.map(renderAddOnCard)}
-      </div>
+      {snacks.length > 0 && (
+        <>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Snacks</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {snacks.map(renderAddOnCard)}
+          </div>
+        </>
+      )}
     </section>
   );
 }

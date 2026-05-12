@@ -1,13 +1,13 @@
 import Link from "next/link";
 
-export default function Footer() {
+export default function Footer({ shopName = "ORA" }: { shopName?: string }) {
   return (
     <footer className="bg-gray-900 text-gray-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <span className="text-2xl font-bold text-white">
-              ORA<span className="text-primary">.</span>
+              ORA<span className="text-primary">N</span>utrition<span className="text-primary">.</span>
             </span>
             <p className="mt-3 text-sm leading-relaxed">
               Fresh, chef-prepared meals delivered to your door. Fuel your goals with zero effort.
@@ -30,7 +30,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-800 mt-10 pt-6 text-sm text-center">
-          &copy; 2026 ORA Nutrition. All rights reserved.
+          &copy; {new Date().getFullYear()} {shopName}. All rights reserved.
         </div>
       </div>
     </footer>
