@@ -2,13 +2,16 @@ import Hero from "@/components/hero";
 import HowItWorks from "@/components/how-it-works";
 import MealPreview from "@/components/meal-preview";
 import Link from "next/link";
+import { getProducts } from "@/lib/shopify-queries";
 
-export default function Home() {
+export default async function Home() {
+  const meals = await getProducts();
+
   return (
     <>
       <Hero />
       <HowItWorks />
-      <MealPreview />
+      <MealPreview meals={meals} />
 
       {/* CTA Banner */}
       <section className="py-20 bg-primary">
