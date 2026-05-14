@@ -48,7 +48,12 @@ export default function MealCard({
         )}
       </div>
       <div className="p-4">
-        <h3 className="font-bold text-gray-900 text-base">{meal.name}</h3>
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="font-bold text-gray-900 text-base">{meal.name}</h3>
+          <span className="text-sm font-semibold text-primary shrink-0">
+            €{meal.price.toFixed(2)}
+          </span>
+        </div>
         <p className="text-gray-500 text-sm mt-1 line-clamp-2">{meal.description}</p>
         {meal.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-3">
