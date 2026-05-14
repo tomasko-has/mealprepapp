@@ -7,6 +7,7 @@ import MealCounterSidebar from "@/components/meal-counter-sidebar";
 import AddOns from "@/components/add-ons";
 import { loadWizardSelections } from "@/lib/wizard-storage";
 import { filterAndSortMeals, getTargetMeals } from "@/lib/meal-filters";
+import { getSelectedMealsTotal } from "@/lib/pricing";
 import type { Meal, AddOn, UserSelections } from "@/lib/types";
 
 export default function MenuContent({ meals }: { meals: Meal[] }) {
@@ -23,6 +24,7 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
   const processedMeals = filterAndSortMeals(meals, selections);
   const targetMeals = getTargetMeals(selections);
   const totalSelected = Object.values(selectedMeals).reduce((sum, qty) => sum + qty, 0);
+  const totalPrice = getSelectedMealsTotal(processedMeals, selectedMeals);
 
   const addOns: AddOn[] = [];
 
@@ -80,6 +82,7 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
               <MealCounterSidebar
                 selected={totalSelected}
                 target={targetMeals}
+                totalPrice={totalPrice}
               />
             </div>
           </div>

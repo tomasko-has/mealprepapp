@@ -1,13 +1,17 @@
 "use client";
 
+import { formatPrice } from "@/lib/pricing";
+
 interface MealCounterSidebarProps {
   selected: number;
   target: number;
+  totalPrice: number;
 }
 
 export default function MealCounterSidebar({
   selected,
   target,
+  totalPrice,
 }: MealCounterSidebarProps) {
   const progress = Math.min((selected / target) * 100, 100);
   const isComplete = selected >= target;
@@ -29,11 +33,20 @@ export default function MealCounterSidebar({
           />
         </div>
 
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 text-center mb-4">
           {isComplete
             ? "All meals selected!"
             : `${target - selected} more to go`}
         </p>
+
+        {selected > 0 && (
+          <div className="text-center mb-4 py-3 bg-gray-50 rounded-xl">
+            <span className="text-sm text-gray-500">Weekly total</span>
+            <div className="text-2xl font-bold text-gray-900">
+              {formatPrice(totalPrice)}
+            </div>
+          </div>
+        )}
 
         <button
           disabled={!isComplete}
