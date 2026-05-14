@@ -48,7 +48,7 @@ export default function AddOns({ addOns }: { addOns: AddOn[] }) {
         <p className="text-xs text-gray-500 mt-0.5 mb-2">{addon.description}</p>
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-gray-900">
-            AED {addon.price.toFixed(1)}
+            €{addon.price.toFixed(2)}
           </span>
           {qty === 0 ? (
             <button
@@ -94,7 +94,7 @@ export default function AddOns({ addOns }: { addOns: AddOn[] }) {
         </div>
         {totalAddOnPrice > 0 && (
           <span className="text-sm font-semibold text-primary">
-            + AED {totalAddOnPrice.toFixed(1)}
+            + €{totalAddOnPrice.toFixed(2)}
           </span>
         )}
       </div>
