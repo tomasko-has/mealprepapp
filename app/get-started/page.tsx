@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import StepIndicator from "@/components/step-indicator";
+import { saveWizardSelections } from "@/lib/wizard-storage";
 import {
   GOALS_OPTIONS,
   PREFERENCE_OPTIONS,
@@ -35,8 +36,30 @@ const initialSelections: UserSelections = {
 };
 
 export default function GetStartedPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [selections, setSelections] = useState<UserSelections>(initialSelections);
+
+  const goToStep = useCallback((newStep: number) => {
+    setStep(newStep);
+    window.history.pushState(null, "", `/get-started?step=${newStep}`);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = Number(params.get("step"));
+    if (s >= 1 && s <= 6) setStep(s);
+  }, []);
+
+  useEffect(() => {
+    function onPopState() {
+      const params = new URLSearchParams(window.location.search);
+      const s = Number(params.get("step"));
+      setStep(s >= 1 && s <= 6 ? s : 1);
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const totalMeals =
     (selections.mealsPerDay ?? 0) * (selections.daysPerWeek ?? 0);
@@ -339,7 +362,7 @@ export default function GetStartedPage() {
         <div className="flex items-center justify-between mt-10 max-w-2xl mx-auto">
           {step > 1 ? (
             <button
-              onClick={() => setStep((s) => s - 1)}
+              onClick={() => goToStep(step - 1)}
               className="text-gray-500 font-semibold hover:text-gray-900 transition-colors"
             >
               Back
@@ -349,21 +372,27 @@ export default function GetStartedPage() {
           )}
           {step < 6 ? (
             <button
-              onClick={() => canAdvance() && setStep((s) => s + 1)}
+              onClick={() => canAdvance() && goToStep(step + 1)}
               disabled={!canAdvance()}
               className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Continue
             </button>
           ) : (
-            <Link
-              href={selections.planType === "flexible" ? "/menu?select=true" : "/menu"}
+            <button
+              onClick={() => {
+                if (!canAdvance()) return;
+                saveWizardSelections(selections);
+                router.push(
+                  selections.planType === "flexible" ? "/menu?select=true" : "/menu"
+                );
+              }}
               className={`bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition-colors ${
                 !canAdvance() ? "opacity-40 pointer-events-none" : ""
               }`}
             >
               {selections.planType === "flexible" ? "Choose Your Meals" : "View Your Menu"}
-            </Link>
+            </button>
           )}
         </div>
       </div>

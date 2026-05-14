@@ -5,16 +5,23 @@ import { TAG_COLORS, formatTagLabel } from "@/lib/tag-utils";
 
 interface MealCardProps {
   meal: Meal;
-  onSelect?: () => void;
-  selected?: boolean;
+  onAdd?: () => void;
+  onRemove?: () => void;
+  quantity?: number;
   showSelect?: boolean;
 }
 
-export default function MealCard({ meal, onSelect, selected, showSelect }: MealCardProps) {
+export default function MealCard({
+  meal,
+  onAdd,
+  onRemove,
+  quantity = 0,
+  showSelect,
+}: MealCardProps) {
   const card = (
     <div
       className={`bg-white rounded-2xl overflow-hidden border-2 transition-all hover:shadow-lg cursor-pointer ${
-        selected ? "border-primary shadow-lg" : "border-gray-100"
+        quantity > 0 ? "border-primary shadow-lg" : "border-gray-100"
       }`}
     >
       <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
@@ -34,6 +41,11 @@ export default function MealCard({ meal, onSelect, selected, showSelect }: MealC
             </svg>
           </div>
         )}
+        {quantity > 0 && (
+          <div className="absolute top-3 right-3 bg-primary text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">
+            {quantity}
+          </div>
+        )}
       </div>
       <div className="p-4">
         <h3 className="font-bold text-gray-900 text-base">{meal.name}</h3>
@@ -51,19 +63,43 @@ export default function MealCard({ meal, onSelect, selected, showSelect }: MealC
           </div>
         )}
         {showSelect && (
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              onSelect?.();
-            }}
-            className={`mt-3 w-full py-2 rounded-full text-sm font-semibold transition-colors ${
-              selected
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            {selected ? "Selected" : "Add to Plan"}
-          </button>
+          <div className="flex items-center gap-2 mt-3">
+            {quantity > 0 ? (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onRemove?.();
+                  }}
+                  className="flex-1 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                >
+                  -
+                </button>
+                <span className="text-sm font-bold text-gray-900 w-8 text-center">
+                  {quantity}
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onAdd?.();
+                  }}
+                  className="flex-1 py-2 rounded-full text-sm font-semibold bg-primary text-white hover:bg-primary-dark transition-colors"
+                >
+                  +
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  onAdd?.();
+                }}
+                className="w-full py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                Add to Plan
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

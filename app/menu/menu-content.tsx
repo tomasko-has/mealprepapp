@@ -1,27 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import MealCard from "@/components/meal-card";
+import MealCounterSidebar from "@/components/meal-counter-sidebar";
 import AddOns from "@/components/add-ons";
-import type { Meal, AddOn } from "@/lib/types";
+import { loadWizardSelections } from "@/lib/wizard-storage";
+import { filterAndSortMeals, getTargetMeals } from "@/lib/meal-filters";
+import type { Meal, AddOn, UserSelections } from "@/lib/types";
 
 export default function MenuContent({ meals }: { meals: Meal[] }) {
   const searchParams = useSearchParams();
   const isSelectMode = searchParams.get("select") === "true";
 
-  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
-  const targetMeals = 12;
+  const [selections, setSelections] = useState<UserSelections | null>(null);
+  const [selectedMeals, setSelectedMeals] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    setSelections(loadWizardSelections());
+  }, []);
+
+  const processedMeals = filterAndSortMeals(meals, selections);
+  const targetMeals = getTargetMeals(selections);
+  const totalSelected = Object.values(selectedMeals).reduce((sum, qty) => sum + qty, 0);
 
   const addOns: AddOn[] = [];
 
-  function toggleMeal(mealId: string) {
+  function addMeal(mealId: string) {
+    if (totalSelected >= targetMeals) return;
+    setSelectedMeals((prev) => ({
+      ...prev,
+      [mealId]: (prev[mealId] || 0) + 1,
+    }));
+  }
+
+  function removeMeal(mealId: string) {
     setSelectedMeals((prev) => {
-      if (prev.includes(mealId)) {
-        return prev.filter((id) => id !== mealId);
+      const current = prev[mealId] || 0;
+      if (current <= 1) {
+        const { [mealId]: _, ...rest } = prev;
+        return rest;
       }
-      if (prev.length >= targetMeals) return prev;
-      return [...prev, mealId];
+      return { ...prev, [mealId]: current - 1 };
     });
   }
 
@@ -37,45 +57,39 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
           </p>
         </div>
 
-        {/* Selection Progress (Flexible mode) */}
-        {isSelectMode && (
-          <div className="bg-white rounded-2xl p-4 mb-8 flex items-center justify-between border border-gray-200 max-w-xl mx-auto">
-            <div>
-              <span className="text-sm text-gray-500">Meals selected</span>
-              <div className="text-xl font-bold text-gray-900">
-                {selectedMeals.length}{" "}
-                <span className="text-gray-400 font-normal">/ {targetMeals}</span>
+        {isSelectMode ? (
+          <div className="flex gap-8">
+            {/* Meal Grid */}
+            <div className="flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {processedMeals.map((meal) => (
+                  <MealCard
+                    key={meal.id}
+                    meal={meal}
+                    showSelect
+                    quantity={selectedMeals[meal.id] || 0}
+                    onAdd={() => addMeal(meal.id)}
+                    onRemove={() => removeMeal(meal.id)}
+                  />
+                ))}
               </div>
             </div>
-            <div className="flex-1 mx-6">
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: `${(selectedMeals.length / targetMeals) * 100}%` }}
-                />
-              </div>
+
+            {/* Sticky Counter Sidebar */}
+            <div className="hidden lg:block w-64 shrink-0">
+              <MealCounterSidebar
+                selected={totalSelected}
+                target={targetMeals}
+              />
             </div>
-            <button
-              disabled={selectedMeals.length < targetMeals}
-              className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors"
-            >
-              Continue
-            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {processedMeals.map((meal) => (
+              <MealCard key={meal.id} meal={meal} />
+            ))}
           </div>
         )}
-
-        {/* Meal Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {meals.map((meal) => (
-            <MealCard
-              key={meal.id}
-              meal={meal}
-              showSelect={isSelectMode}
-              selected={selectedMeals.includes(meal.id)}
-              onSelect={() => toggleMeal(meal.id)}
-            />
-          ))}
-        </div>
 
         {/* Add-ons Section */}
         <AddOns addOns={addOns} />
