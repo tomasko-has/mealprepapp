@@ -120,6 +120,7 @@ function shopifyProductToMeal(product: ShopifyProduct): Meal {
     ingredients: product.ingredients?.value
       ? product.ingredients.value.split(",").map((s) => s.trim())
       : [],
+    price: parseFloat(product.priceRange.minVariantPrice.amount),
   };
 }
 

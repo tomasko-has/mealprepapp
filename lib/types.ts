@@ -10,6 +10,7 @@ export interface Meal {
   fat: number;
   ingredients: string[];
   image: string;
+  price: number;
 }
 
 export type MealTag = "calorie-smart" | "high-protein" | "gluten-free" | "healthy" | "low-carb" | "keto";
