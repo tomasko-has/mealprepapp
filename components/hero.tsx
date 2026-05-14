@@ -30,12 +30,12 @@ export default function Hero() {
             >
               Get Started
             </Link>
-            <Link
-              href="/menu"
+            <a
+              href="#menu"
               className="border border-white/30 text-white px-8 py-3.5 rounded-full text-base font-semibold hover:bg-white/10 transition-colors text-center"
             >
               View Menu
-            </Link>
+            </a>
           </div>
         </div>
       </div>

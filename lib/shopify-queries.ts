@@ -124,6 +124,62 @@ function shopifyProductToMeal(product: ShopifyProduct): Meal {
   };
 }
 
+const COLLECTION_BY_HANDLE_QUERY = `#graphql
+  query GetCollectionByHandle($handle: String!, $first: Int!) {
+    collection(handle: $handle) {
+      title
+      products(first: $first) {
+        edges {
+          node {
+            handle
+            title
+            description
+            tags
+            featuredImage {
+              url
+              altText
+            }
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            calories: metafield(namespace: "custom", key: "calories") {
+              value
+            }
+            protein: metafield(namespace: "custom", key: "protein") {
+              value
+            }
+            carbs: metafield(namespace: "custom", key: "carbs") {
+              value
+            }
+            fat: metafield(namespace: "custom", key: "fat") {
+              value
+            }
+            ingredients: metafield(namespace: "custom", key: "ingredients") {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const WEEK_COLLECTIONS_QUERY = `#graphql
+  query GetWeekCollections($first: Int!, $query: String!) {
+    collections(first: $first, query: $query) {
+      edges {
+        node {
+          handle
+          title
+        }
+      }
+    }
+  }
+`;
+
 const SHOP_QUERY = `#graphql
   query GetShop {
     shop {
@@ -154,6 +210,44 @@ export async function getProducts(first = 20): Promise<Meal[]> {
   }
 
   const edges = data?.products?.edges ?? [];
+  return edges.map((edge: { node: ShopifyProduct }) =>
+    shopifyProductToMeal(edge.node)
+  );
+}
+
+export async function getWeekCollections(): Promise<{ handle: string; title: string }[]> {
+  const { data, errors } = await shopifyClient.request(WEEK_COLLECTIONS_QUERY, {
+    variables: { first: 10, query: "title:week-*" },
+  });
+
+  if (errors) {
+    console.error("Shopify API errors:", errors);
+    return [];
+  }
+
+  const edges = data?.collections?.edges ?? [];
+  return edges
+    .map((edge: { node: { handle: string; title: string } }) => ({
+      handle: edge.node.handle,
+      title: edge.node.title,
+    }))
+    .sort((a: { handle: string }, b: { handle: string }) => a.handle.localeCompare(b.handle));
+}
+
+export async function getProductsByCollection(handle: string, first = 20): Promise<Meal[]> {
+  console.log("Fetching collection:", handle);
+  const { data, errors } = await shopifyClient.request(COLLECTION_BY_HANDLE_QUERY, {
+    variables: { handle, first },
+  });
+
+  if (errors) {
+    console.error("Shopify API errors:", errors);
+    return [];
+  }
+
+  console.log("Collection data:", JSON.stringify(data?.collection ? { title: data.collection.title, productCount: data.collection.products?.edges?.length } : null));
+
+  const edges = data?.collection?.products?.edges ?? [];
   return edges.map((edge: { node: ShopifyProduct }) =>
     shopifyProductToMeal(edge.node)
   );

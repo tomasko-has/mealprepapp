@@ -57,7 +57,7 @@ export default function MealCard({
         <p className="text-gray-500 text-sm mt-1 line-clamp-2">{meal.description}</p>
         {meal.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {meal.tags.map((tag) => (
+            {meal.tags.filter((tag) => !tag.startsWith("week-") && TAG_COLORS[tag]).map((tag) => (
               <span
                 key={tag}
                 className={`px-2.5 py-1 rounded-full text-xs font-semibold ${TAG_COLORS[tag] || "bg-gray-100 text-gray-700"}`}
