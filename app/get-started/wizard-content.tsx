@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import StepIndicator from "@/components/step-indicator";
-import { saveWizardSelections } from "@/lib/wizard-storage";
+import { saveWizardSelections, loadWizardSelections } from "@/lib/wizard-storage";
 import {
   GOALS_OPTIONS,
   PREFERENCE_OPTIONS,
@@ -41,17 +41,30 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [selections, setSelections] = useState<UserSelections>(initialSelections);
+  const [loaded, setLoaded] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
+  const [direction, setDirection] = useState<"forward" | "back">("forward");
 
   const goToStep = useCallback((newStep: number) => {
+    setDirection(newStep > step ? "forward" : "back");
+    setAnimKey((k) => k + 1);
     setStep(newStep);
     window.history.pushState(null, "", `/get-started?step=${newStep}`);
-  }, []);
+  }, [step]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const s = Number(params.get("step"));
     if (s >= 1 && s <= 6) setStep(s);
+
+    const saved = loadWizardSelections();
+    if (saved) setSelections(saved);
+    setLoaded(true);
   }, []);
+
+  useEffect(() => {
+    if (loaded) saveWizardSelections(selections);
+  }, [selections, loaded]);
 
   useEffect(() => {
     function onPopState() {
@@ -122,6 +135,14 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
     <div className="min-h-[80vh] bg-[#e8e8e4] py-12">
       <div className="max-w-3xl mx-auto px-4">
         <StepIndicator currentStep={step} totalSteps={6} labels={STEP_LABELS} />
+
+        <div
+          key={animKey}
+          className="animate-step-transition"
+          style={{
+            ["--slide-from" as string]: direction === "forward" ? "30px" : "-30px",
+          }}
+        >
 
         {/* Step 1: Goals */}
         {step === 1 && (
@@ -294,11 +315,11 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
             <p className="text-gray-500 text-center mb-8">
               {totalMeals} meals per week
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {/* Standard */}
               <button
                 onClick={() => setSelections((s) => ({ ...s, planType: "standard" }))}
-                className={`relative p-6 rounded-2xl border-2 text-left transition-all ${
+                className={`relative p-8 rounded-2xl border-2 text-left transition-all ${
                   selections.planType === "standard"
                     ? "border-primary bg-primary-light/30 ring-2 ring-primary"
                     : "border-gray-200 bg-white hover:border-gray-300"
@@ -307,28 +328,28 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
                 <span className="absolute -top-3 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
                   Recommended
                 </span>
-                <h3 className="text-xl font-bold text-gray-900 mt-2">Standard Plan</h3>
-                <p className="text-sm text-gray-500 mt-2 mb-4">
+                <h3 className="text-3xl font-extrabold text-gray-900 mt-2 mb-6">Standard Plan</h3>
+                <p className="text-base text-gray-500 mt-3 mb-5">
                   Pre-selected meals optimized for your preferences. No decisions needed.
                 </p>
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-4xl font-bold text-gray-900">
                   {formatPrice(standardWeekly)}
-                  <span className="text-base font-normal text-gray-500">/week</span>
+                  <span className="text-lg font-normal text-gray-500">/week</span>
                 </div>
-                <p className="text-sm text-primary font-semibold mt-1">
+                <p className="text-base text-primary font-semibold mt-2">
                   {formatPrice(standardPerMeal)} per meal — {Math.round(STANDARD_DISCOUNT * 100)}% off
                 </p>
-                <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                <ul className="mt-6 space-y-3 text-base text-gray-600">
                   <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     No decision fatigue
                   </li>
                   <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     Auto-renewed weekly
                   </li>
                   <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     Discounted price
                   </li>
                 </ul>
@@ -337,34 +358,34 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
               {/* Flexible */}
               <button
                 onClick={() => setSelections((s) => ({ ...s, planType: "flexible" }))}
-                className={`p-6 rounded-2xl border-2 text-left transition-all ${
+                className={`p-8 rounded-2xl border-2 text-left transition-all ${
                   selections.planType === "flexible"
                     ? "border-primary bg-primary-light/30 ring-2 ring-primary"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
               >
-                <h3 className="text-xl font-bold text-gray-900 mt-2">Flexible Plan</h3>
-                <p className="text-sm text-gray-500 mt-2 mb-4">
+                <h3 className="text-3xl font-extrabold text-gray-900 mt-2 mb-6">Flexible Plan</h3>
+                <p className="text-base text-gray-500 mt-3 mb-5">
                   Pick your own meals each week from our rotating menu of 14 options.
                 </p>
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-4xl font-bold text-gray-900">
                   ~{formatPrice(flexibleWeekly)}
-                  <span className="text-base font-normal text-gray-500">/week</span>
+                  <span className="text-lg font-normal text-gray-500">/week</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-base text-gray-500 mt-2">
                   ~{formatPrice(avgPrice)} per meal avg — final price based on your picks
                 </p>
-                <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                <ul className="mt-6 space-y-3 text-base text-gray-600">
                   <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     Full meal control
                   </li>
                   <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     Choose from 14 meals weekly
                   </li>
                   <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     Pick duplicates allowed
                   </li>
                 </ul>
@@ -372,6 +393,8 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
             </div>
           </div>
         )}
+
+        </div>{/* end animate-step-transition */}
 
         {/* Navigation */}
         <div className="flex items-center justify-between mt-10 max-w-2xl mx-auto">

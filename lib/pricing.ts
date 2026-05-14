@@ -1,6 +1,6 @@
 import type { Meal } from "./types";
 
-export const STANDARD_DISCOUNT = 0.10;
+export const STANDARD_DISCOUNT = 0.20;
 
 export function getAveragePrice(meals: Meal[]): number {
   if (meals.length === 0) return 0;
