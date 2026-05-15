@@ -1,6 +1,7 @@
 import Hero from "@/components/hero";
 import HowItWorks from "@/components/how-it-works";
 import MealPreview from "@/components/meal-preview";
+import PlanCards from "@/components/plan-cards";
 import Link from "next/link";
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
       <Hero />
       <HowItWorks />
       <MealPreview />
+      <PlanCards />
 
       {/* CTA Banner */}
       <section className="py-20 bg-primary">
