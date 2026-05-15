@@ -235,7 +235,6 @@ export async function getWeekCollections(): Promise<{ handle: string; title: str
 }
 
 export async function getProductsByCollection(handle: string, first = 20): Promise<Meal[]> {
-  console.log("Fetching collection:", handle);
   const { data, errors } = await shopifyClient.request(COLLECTION_BY_HANDLE_QUERY, {
     variables: { handle, first },
   });
@@ -244,8 +243,6 @@ export async function getProductsByCollection(handle: string, first = 20): Promi
     console.error("Shopify API errors:", errors);
     return [];
   }
-
-  console.log("Collection data:", JSON.stringify(data?.collection ? { title: data.collection.title, productCount: data.collection.products?.edges?.length } : null));
 
   const edges = data?.collection?.products?.edges ?? [];
   return edges.map((edge: { node: ShopifyProduct }) =>

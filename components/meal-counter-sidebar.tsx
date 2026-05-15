@@ -6,12 +6,14 @@ interface MealCounterSidebarProps {
   selected: number;
   target: number;
   totalPrice: number;
+  onContinue?: () => void;
 }
 
 export default function MealCounterSidebar({
   selected,
   target,
   totalPrice,
+  onContinue,
 }: MealCounterSidebarProps) {
   const progress = Math.min((selected / target) * 100, 100);
   const isComplete = selected >= target;
@@ -50,6 +52,7 @@ export default function MealCounterSidebar({
 
         <button
           disabled={!isComplete}
+          onClick={onContinue}
           className="w-full bg-primary text-white py-3 rounded-full text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors"
         >
           Continue

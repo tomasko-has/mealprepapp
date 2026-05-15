@@ -9,9 +9,9 @@ export default function Navbar({ shopName = "ORA" }: { shopName?: string }) {
             ORA<span className="text-primary">N</span>utrition<span className="text-primary">.</span>
           </Link>
           <div className="hidden md:flex items-center gap-0 h-full">
-            <Link href="/menu" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
+            <a href="/#menu" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
               Weekly Menu
-            </Link>
+            </a>
             <Link href="/get-started" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
               Our Plans
             </Link>
