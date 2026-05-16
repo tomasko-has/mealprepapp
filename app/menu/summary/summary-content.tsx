@@ -10,6 +10,9 @@ import { formatPrice, STANDARD_DISCOUNT } from "@/lib/pricing";
 export default function SummaryContent() {
   const router = useRouter();
   const [order, setOrder] = useState<OrderData | null>(null);
+  const [disclaimerChecked, setDisclaimerChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const data = loadOrderData();
@@ -40,6 +43,40 @@ export default function SummaryContent() {
   const orderTotal = mealsTotal + addOnsTotal;
   const totalMeals = order.selectedMeals.reduce((sum, { quantity }) => sum + quantity, 0);
   const totalAddOns = order.selectedAddOns.reduce((sum, { quantity }) => sum + quantity, 0);
+
+  async function handleCheckout() {
+    if (!disclaimerChecked || isLoading) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const wizard = loadWizardSelections();
+
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...order,
+          goals: wizard?.goals,
+          avoid: wizard?.avoid,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.checkoutUrl) {
+        setError(data.error || "Failed to create cart. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      window.location.href = data.checkoutUrl;
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-[80vh] bg-[#e8e8e4] py-12">
@@ -149,7 +186,7 @@ export default function SummaryContent() {
         )}
 
         {/* Price Breakdown */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">Meals subtotal ({totalMeals} items)</span>
@@ -174,11 +211,64 @@ export default function SummaryContent() {
           </div>
         </div>
 
+        {/* Delivery Info */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-4">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+            </svg>
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold text-gray-900">Delivered every Sunday, Tuesday, Thursday</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Subscription Disclaimer */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={disclaimerChecked}
+              onChange={(e) => setDisclaimerChecked(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary shrink-0"
+            />
+            <span className="text-xs text-gray-500 leading-relaxed">
+              I understand that I am subscribing to a meal plan subscription. Active
+              subscriptions are auto-generated every Thursday. Standard plans are
+              automatically renewed weekly. For the flexible plan, meals must be
+              selected each week, otherwise the standard plan will be delivered.
+            </span>
+          </label>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Checkout Button */}
         <button
-          className="w-full bg-primary text-white py-4 rounded-full text-base font-semibold hover:bg-primary-dark transition-colors"
+          onClick={handleCheckout}
+          disabled={!disclaimerChecked || isLoading}
+          className={`w-full py-4 rounded-full text-base font-semibold transition-colors ${
+            disclaimerChecked && !isLoading
+              ? "bg-primary text-white hover:bg-primary-dark"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
-          Proceed to Checkout
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Creating checkout...
+            </span>
+          ) : (
+            "Proceed to Checkout"
+          )}
         </button>
       </div>
     </div>

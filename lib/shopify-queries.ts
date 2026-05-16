@@ -265,3 +265,101 @@ export async function getProductByHandle(handle: string): Promise<Meal | null> {
 
   return shopifyProductToMeal(product);
 }
+
+const PLAN_PRODUCTS_QUERY = `#graphql
+  query GetPlanProducts {
+    products(first: 10, query: "product_type:plan") {
+      edges {
+        node {
+          id
+          title
+          handle
+          variants(first: 30) {
+            edges {
+              node {
+                id
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+          sellingPlanGroups(first: 5) {
+            edges {
+              node {
+                sellingPlans(first: 5) {
+                  edges {
+                    node {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export interface PlanVariant {
+  id: string;
+  title: string;
+  price: { amount: string; currencyCode: string };
+}
+
+export interface SellingPlan {
+  id: string;
+  name: string;
+}
+
+export interface PlanProduct {
+  id: string;
+  title: string;
+  handle: string;
+  variants: PlanVariant[];
+  sellingPlans: SellingPlan[];
+}
+
+export async function getPlanProducts(): Promise<PlanProduct[]> {
+  const { data, errors } = await shopifyClient.request(PLAN_PRODUCTS_QUERY);
+
+  if (errors) {
+    console.error("Shopify API errors (plan products):", errors);
+    return [];
+  }
+
+  const edges = data?.products?.edges ?? [];
+  return edges.map(
+    (edge: {
+      node: {
+        id: string;
+        title: string;
+        handle: string;
+        variants: { edges: { node: PlanVariant }[] };
+        sellingPlanGroups: {
+          edges: {
+            node: { sellingPlans: { edges: { node: SellingPlan }[] } };
+          }[];
+        };
+      };
+    }) => {
+      const node = edge.node;
+      const variants = node.variants.edges.map((ve) => ve.node);
+      const sellingPlans = node.sellingPlanGroups.edges.flatMap((sg) =>
+        sg.node.sellingPlans.edges.map((sp) => sp.node)
+      );
+      return {
+        id: node.id,
+        title: node.title,
+        handle: node.handle,
+        variants,
+        sellingPlans,
+      };
+    }
+  );
+}
