@@ -6,6 +6,9 @@ import {
   buildAuthorizeUrl,
 } from "@/lib/shopify-auth";
 
+const APP_URL = process.env.APP_URL || "http://localhost:3000";
+const isSecure = APP_URL.startsWith("https");
+
 export async function GET() {
   const { codeVerifier, codeChallenge } = await generatePKCE();
   const state = generateState();
@@ -17,7 +20,7 @@ export async function GET() {
 
   response.cookies.set("code_verifier", codeVerifier, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     path: "/",
     maxAge: 300,
@@ -25,7 +28,7 @@ export async function GET() {
 
   response.cookies.set("oauth_state", state, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     path: "/",
     maxAge: 300,
@@ -33,7 +36,7 @@ export async function GET() {
 
   response.cookies.set("oauth_nonce", nonce, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     path: "/",
     maxAge: 300,

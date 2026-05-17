@@ -1,6 +1,5 @@
-const SHOP_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN!;
-const API_VERSION = process.env.SHOPIFY_API_VERSION || "2025-04";
-const CUSTOMER_API_URL = `https://${SHOP_DOMAIN}/account/customer/api/${API_VERSION}/graphql`;
+const SHOP_ID = process.env.SHOPIFY_SHOP_ID!;
+const CUSTOMER_API_URL = `https://shopify.com/${SHOP_ID}/account/customer/api/2025-04/graphql`;
 
 const CUSTOMER_QUERY = `#graphql
   query GetCustomer {
@@ -67,23 +66,29 @@ async function customerQuery<T>(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: accessToken,
     },
     body: JSON.stringify({ query }),
   });
 
+  const text = await res.text();
+
   if (!res.ok) {
-    console.error("Customer API error:", res.status, await res.text());
+    console.error("Customer API error:", res.status, text.substring(0, 500));
     return null;
   }
 
-  const json = await res.json();
-  if (json.errors) {
-    console.error("Customer API GraphQL errors:", json.errors);
+  try {
+    const json = JSON.parse(text);
+    if (json.errors) {
+      console.error("Customer API GraphQL errors:", json.errors);
+      return null;
+    }
+    return json.data;
+  } catch {
+    console.error("Customer API returned non-JSON:", text.substring(0, 500));
     return null;
   }
-
-  return json.data;
 }
 
 export async function getCustomerProfile(

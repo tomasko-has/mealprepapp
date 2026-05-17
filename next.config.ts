@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["reunion-hepatitis-address-care.trycloudflare.com"],
   images: {
     remotePatterns: [
       {

@@ -70,16 +70,18 @@ export async function exchangeCodeForTokens(
   code: string,
   codeVerifier: string
 ): Promise<TokenResponse> {
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    client_id: CLIENT_ID,
+    code,
+    code_verifier: codeVerifier,
+    redirect_uri: REDIRECT_URI,
+  });
+
   const res = await fetch(TOKEN_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      grant_type: "authorization_code",
-      client_id: CLIENT_ID,
-      code,
-      code_verifier: codeVerifier,
-      redirect_uri: REDIRECT_URI,
-    }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
   });
 
   if (!res.ok) {
@@ -93,14 +95,16 @@ export async function exchangeCodeForTokens(
 export async function refreshAccessToken(
   refreshToken: string
 ): Promise<TokenResponse> {
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    client_id: CLIENT_ID,
+    refresh_token: refreshToken,
+  });
+
   const res = await fetch(TOKEN_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      grant_type: "refresh_token",
-      client_id: CLIENT_ID,
-      refresh_token: refreshToken,
-    }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
   });
 
   if (!res.ok) {
