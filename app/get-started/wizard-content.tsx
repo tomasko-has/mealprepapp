@@ -132,7 +132,7 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
   }
 
   return (
-    <div className="min-h-[80vh] bg-[#e8e8e4] py-12">
+    <div className="min-h-[80vh] bg-[#e8e8e4] py-12 pb-24 sm:pb-12">
       <div className="max-w-3xl mx-auto px-4">
         <StepIndicator currentStep={step} totalSteps={6} labels={STEP_LABELS} />
 
@@ -396,8 +396,8 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
 
         </div>{/* end animate-step-transition */}
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-10 max-w-2xl mx-auto">
+        {/* Navigation — desktop inline, mobile sticky bottom */}
+        <div className="hidden sm:flex items-center justify-between mt-10 max-w-2xl mx-auto">
           {step > 1 ? (
             <button
               onClick={() => goToStep(step - 1)}
@@ -433,6 +433,44 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
             </button>
           )}
         </div>
+      </div>
+
+      {/* Mobile sticky navigation */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-50">
+        {step > 1 ? (
+          <button
+            onClick={() => goToStep(step - 1)}
+            className="text-gray-500 font-semibold hover:text-gray-900 transition-colors"
+          >
+            Back
+          </button>
+        ) : (
+          <div />
+        )}
+        {step < 6 ? (
+          <button
+            onClick={() => canAdvance() && goToStep(step + 1)}
+            disabled={!canAdvance()}
+            className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Continue
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              if (!canAdvance()) return;
+              saveWizardSelections(selections);
+              router.push(
+                selections.planType === "flexible" ? "/menu?select=true" : "/menu"
+              );
+            }}
+            className={`bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition-colors ${
+              !canAdvance() ? "opacity-40 pointer-events-none" : ""
+            }`}
+          >
+            {selections.planType === "flexible" ? "Choose Your Meals" : "View Your Menu"}
+          </button>
+        )}
       </div>
     </div>
   );
