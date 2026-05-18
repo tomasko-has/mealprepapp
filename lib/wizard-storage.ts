@@ -7,6 +7,11 @@ export function saveWizardSelections(selections: UserSelections): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(selections));
 }
 
+export function clearWizardSelections(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(STORAGE_KEY);
+}
+
 export function loadWizardSelections(): UserSelections | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(STORAGE_KEY);

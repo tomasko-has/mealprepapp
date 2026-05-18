@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { loadOrderData, type OrderData } from "@/lib/order-storage";
-import { loadWizardSelections } from "@/lib/wizard-storage";
+import { loadWizardSelections, clearWizardSelections } from "@/lib/wizard-storage";
 import { formatPrice, STANDARD_DISCOUNT } from "@/lib/pricing";
 
 export default function SummaryContent() {
@@ -71,6 +71,7 @@ export default function SummaryContent() {
         return;
       }
 
+      clearWizardSelections();
       window.location.href = data.checkoutUrl;
     } catch {
       setError("Something went wrong. Please try again.");

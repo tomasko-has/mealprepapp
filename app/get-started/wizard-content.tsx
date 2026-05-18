@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import StepIndicator from "@/components/step-indicator";
-import { saveWizardSelections, loadWizardSelections } from "@/lib/wizard-storage";
+import { saveWizardSelections, loadWizardSelections, clearWizardSelections } from "@/lib/wizard-storage";
 import {
   GOALS_OPTIONS,
   PREFERENCE_OPTIONS,
