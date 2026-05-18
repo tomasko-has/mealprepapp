@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getCustomerProfile, getCustomerOrders } from "@/lib/shopify-customer";
+import { getCustomerProfile, getCustomerOrders, getCustomerSubscriptions } from "@/lib/shopify-customer";
 import { refreshAccessToken } from "@/lib/shopify-auth";
 
 export async function GET() {
@@ -20,14 +20,15 @@ export async function GET() {
     return Response.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const [profile, orders] = await Promise.all([
+  const [profile, orders, subscriptions] = await Promise.all([
     getCustomerProfile(accessToken),
     getCustomerOrders(accessToken),
+    getCustomerSubscriptions(accessToken),
   ]);
 
   if (!profile) {
     return Response.json({ error: "Failed to fetch customer data" }, { status: 500 });
   }
 
-  return Response.json({ profile, orders });
+  return Response.json({ profile, orders, subscriptions });
 }
