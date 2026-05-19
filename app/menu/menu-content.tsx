@@ -99,7 +99,7 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
   }
 
   return (
-    <div className="min-h-[80vh] bg-[#e8e8e4] py-12">
+    <div className="min-h-[80vh] bg-[#e8e8e4] py-12 pb-24 lg:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
@@ -179,6 +179,60 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
           </div>
         )}
       </div>
+
+      {/* Mobile sticky bottom bar — flexible */}
+      {isSelectMode && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-gray-900">
+                {totalSelected} / {targetMeals} meals
+              </span>
+              <span className="text-sm text-gray-500">
+                {totalSelected >= targetMeals
+                  ? "All meals selected!"
+                  : `${targetMeals - totalSelected} more to go`}
+              </span>
+            </div>
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-300"
+                style={{ width: `${Math.min((totalSelected / targetMeals) * 100, 100)}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-lg font-bold text-gray-900">{formatPrice(totalPrice)}</div>
+              <button
+                onClick={handleContinue}
+                disabled={totalSelected < targetMeals}
+                className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selections?.planType === "standard" && !isSelectMode && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
+          <div className="flex items-center justify-between max-w-3xl mx-auto">
+            <div>
+              <span className="text-sm text-gray-500">Standard Plan · {targetMeals} meals</span>
+              <div className="text-lg font-bold text-gray-900">
+                {formatPrice(standardWeekly)}
+                <span className="text-xs text-primary font-semibold ml-1">{Math.round(STANDARD_DISCOUNT * 100)}% off</span>
+              </div>
+            </div>
+            <button
+              onClick={handleContinue}
+              className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-dark transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add-ons Popup */}
       <AddOnsPopup
