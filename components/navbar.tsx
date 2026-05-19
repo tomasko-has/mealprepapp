@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import LogoLink from "./logo-link";
 
 export default async function Navbar({ shopName = "ORA" }: { shopName?: string }) {
   const cookieStore = await cookies();
@@ -10,16 +11,14 @@ export default async function Navbar({ shopName = "ORA" }: { shopName?: string }
     <nav className="sticky top-0 z-50 bg-white border-y border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          <Link href="/" className="text-2xl font-bold text-gray-900 shrink-0">
-            ORA<span className="text-primary">N</span>utrition<span className="text-primary">.</span>
-          </Link>
+          <LogoLink />
           <div className="hidden md:flex items-center gap-0 h-full">
             <a href="/#menu" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
               Weekly Menu
             </a>
-            <Link href="/get-started" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
+            <a href="/#plans" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
               Our Plans
-            </Link>
+            </a>
             <Link href="/how-it-works" className="h-full flex items-center px-5 text-sm font-medium text-gray-600 hover:bg-primary-light hover:text-gray-900 border-b-2 border-transparent hover:border-primary transition-all">
               How It Works
             </Link>
