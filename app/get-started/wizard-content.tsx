@@ -55,10 +55,15 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const s = Number(params.get("step"));
-    if (s >= 1 && s <= 6) setStep(s);
 
-    const saved = loadWizardSelections();
-    if (saved) setSelections(saved);
+    if (s >= 1 && s <= 6) {
+      setStep(s);
+      const saved = loadWizardSelections();
+      if (saved) setSelections(saved);
+    } else {
+      clearWizardSelections();
+    }
+
     setLoaded(true);
   }, []);
 
