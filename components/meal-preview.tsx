@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import MealCard from "./meal-card";
-import WeekSelector, { parseWeekCollection, type WeekCollection } from "./week-selector";
+import WeekSelector, { parseWeekCollection, findCurrentWeekIndex, getStartDate, type WeekCollection } from "./week-selector";
 import type { Meal } from "@/lib/types";
 
 export default function MealPreview() {
@@ -15,8 +15,21 @@ export default function MealPreview() {
     fetch("/api/weeks")
       .then((res) => res.json())
       .then(async (data) => {
-        const parsed = data.map(parseWeekCollection);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const parsed = data
+          .map(parseWeekCollection)
+          .filter((w: WeekCollection) => {
+            const start = getStartDate(w.handle);
+            if (!start) return true;
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            return end >= today;
+          });
+
         setWeeks(parsed);
+        setActiveWeek(findCurrentWeekIndex(parsed));
 
         const allMeals: Record<string, Meal[]> = {};
         await Promise.all(

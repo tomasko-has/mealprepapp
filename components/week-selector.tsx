@@ -7,6 +7,34 @@ export interface WeekCollection {
   dates: string;
 }
 
+export function getStartDate(handle: string): Date | null {
+  const match = handle.match(/^week-(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+export function findCurrentWeekIndex(weeks: WeekCollection[]): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < weeks.length; i++) {
+    const start = getStartDate(weeks[i].handle);
+    if (!start) continue;
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    if (today >= start && today <= end) return i;
+  }
+
+  // If no exact match, find the next upcoming week
+  for (let i = 0; i < weeks.length; i++) {
+    const start = getStartDate(weeks[i].handle);
+    if (!start) continue;
+    if (start > today) return i;
+  }
+
+  return 0;
+}
+
 export function parseWeekCollection(col: { handle: string; title: string }): WeekCollection {
   // handle format: week-YYYY-MM-DD
   const match = col.handle.match(/^week-(\d{4})-(\d{2})-(\d{2})$/);
