@@ -38,6 +38,27 @@ function SubscriptionSection({
   const [cancelling, setCancelling] = useState(false);
 
   const active = subscriptions.find((s) => s.status === "ACTIVE" || s.status === "PAUSED");
+  const cancelled = subscriptions.find((s) => s.status === "CANCELLED");
+
+  if (!active && cancelled) {
+    return (
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-bold text-gray-900">Your Subscription</h2>
+          <StatusBadge status="CANCELLED" />
+        </div>
+        <p className="text-sm text-gray-500 mb-4">
+          Your subscription has been cancelled. No further deliveries will be made.
+        </p>
+        <Link
+          href="/get-started"
+          className="inline-block bg-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-dark transition-colors"
+        >
+          Start a New Plan
+        </Link>
+      </div>
+    );
+  }
 
   if (!active) {
     return (
