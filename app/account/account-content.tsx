@@ -128,13 +128,6 @@ function SubscriptionSection({
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Link
-          href="/menu"
-          className="inline-block bg-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-dark transition-colors"
-        >
-          Select Meals for Next Week
-        </Link>
-
         {active.status === "ACTIVE" && confirmId !== active.id && (
           <button
             onClick={() => setConfirmId(active.id)}
