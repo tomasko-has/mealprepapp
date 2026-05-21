@@ -8,7 +8,7 @@ import AddOnsPopup, { type AddOnSelection } from "@/components/addons-popup";
 import { loadWizardSelections } from "@/lib/wizard-storage";
 import { saveOrderData, loadOrderData } from "@/lib/order-storage";
 import { filterAndSortMeals, getTargetMeals } from "@/lib/meal-filters";
-import { getAveragePrice, getStandardWeeklyPrice, formatPrice, STANDARD_DISCOUNT, getSelectedMealsTotal } from "@/lib/pricing";
+import { getShopifyPlanPrice, formatPrice, STANDARD_DISCOUNT, getSelectedMealsTotal, type PlanPricing } from "@/lib/pricing";
 import type { Meal, UserSelections } from "@/lib/types";
 
 export default function MenuContent({ meals }: { meals: Meal[] }) {
@@ -19,6 +19,7 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
   const [selections, setSelections] = useState<UserSelections | null>(null);
   const [selectedMeals, setSelectedMeals] = useState<Record<string, number>>({});
   const [showAddOns, setShowAddOns] = useState(false);
+  const [planPricing, setPlanPricing] = useState<PlanPricing>({});
 
   useEffect(() => {
     setSelections(loadWizardSelections());
@@ -30,14 +31,17 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
       }
       setSelectedMeals(restored);
     }
+    fetch("/api/plans")
+      .then((res) => res.json())
+      .then(setPlanPricing)
+      .catch(() => {});
   }, []);
 
   const processedMeals = filterAndSortMeals(meals, selections);
   const targetMeals = getTargetMeals(selections);
   const totalSelected = Object.values(selectedMeals).reduce((sum, qty) => sum + qty, 0);
   const totalPrice = getSelectedMealsTotal(processedMeals, selectedMeals);
-  const avgPrice = getAveragePrice(meals);
-  const standardWeekly = getStandardWeeklyPrice(avgPrice, selections?.mealsPerDay ?? 0, selections?.daysPerWeek ?? 0);
+  const standardWeekly = getShopifyPlanPrice(planPricing, "standard", targetMeals) ?? 0;
 
   function addMeal(mealId: string) {
     if (totalSelected >= targetMeals) return;

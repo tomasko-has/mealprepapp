@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { loadOrderData, type OrderData } from "@/lib/order-storage";
 import { loadWizardSelections, clearWizardSelections } from "@/lib/wizard-storage";
-import { formatPrice, STANDARD_DISCOUNT } from "@/lib/pricing";
+import { formatPrice, STANDARD_DISCOUNT, type PlanPricing } from "@/lib/pricing";
 
 export default function SummaryContent() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function SummaryContent() {
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [planPricing, setPlanPricing] = useState<PlanPricing>({});
 
   useEffect(() => {
     const data = loadOrderData();
@@ -21,17 +22,25 @@ export default function SummaryContent() {
       return;
     }
     setOrder(data);
+    fetch("/api/plans")
+      .then((res) => res.json())
+      .then(setPlanPricing)
+      .catch(() => {});
   }, [router]);
 
   if (!order) {
     return <div className="min-h-[80vh] bg-[#e8e8e4]" />;
   }
 
-  const mealsSubtotal = order.selectedMeals.reduce(
+  const totalMeals = order.selectedMeals.reduce((sum, { quantity }) => sum + quantity, 0);
+
+  // Use Shopify fixed variant price when available, fall back to calculated
+  const planType = order.planType as "standard" | "flexible";
+  const shopifyBase = planPricing[planType]?.[totalMeals];
+  const mealsSubtotal = shopifyBase ?? order.selectedMeals.reduce(
     (sum, { meal, quantity }) => sum + meal.price * quantity,
     0
   );
-
   const discount = order.planType === "standard" ? mealsSubtotal * STANDARD_DISCOUNT : 0;
   const mealsTotal = mealsSubtotal - discount;
 
@@ -41,7 +50,6 @@ export default function SummaryContent() {
   );
 
   const orderTotal = mealsTotal + addOnsTotal;
-  const totalMeals = order.selectedMeals.reduce((sum, { quantity }) => sum + quantity, 0);
   const totalAddOns = order.selectedAddOns.reduce((sum, { quantity }) => sum + quantity, 0);
 
   async function handleCheckout() {

@@ -11,10 +11,9 @@ import {
 } from "@/lib/data";
 import {
   STANDARD_DISCOUNT,
-  getAveragePrice,
-  getStandardWeeklyPrice,
-  getFlexibleWeeklyPrice,
+  getShopifyPlanPrice,
   formatPrice,
+  type PlanPricing,
 } from "@/lib/pricing";
 import type {
   Goal,
@@ -44,6 +43,7 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
   const [loaded, setLoaded] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
+  const [planPricing, setPlanPricing] = useState<PlanPricing>({});
 
   const goToStep = useCallback((newStep: number) => {
     setDirection(newStep > step ? "forward" : "back");
@@ -65,6 +65,11 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
     }
 
     setLoaded(true);
+
+    fetch("/api/plans")
+      .then((res) => res.json())
+      .then(setPlanPricing)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -84,17 +89,8 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
   const totalMeals =
     (selections.mealsPerDay ?? 0) * (selections.daysPerWeek ?? 0);
 
-  const avgPrice = getAveragePrice(meals);
-  const standardWeekly = getStandardWeeklyPrice(
-    avgPrice,
-    selections.mealsPerDay ?? 0,
-    selections.daysPerWeek ?? 0
-  );
-  const flexibleWeekly = getFlexibleWeeklyPrice(
-    avgPrice,
-    selections.mealsPerDay ?? 0,
-    selections.daysPerWeek ?? 0
-  );
+  const standardWeekly = getShopifyPlanPrice(planPricing, "standard", totalMeals) ?? 0;
+  const flexibleWeekly = getShopifyPlanPrice(planPricing, "flexible", totalMeals) ?? 0;
   const standardPerMeal = totalMeals > 0 ? standardWeekly / totalMeals : 0;
 
   function toggleGoal(goal: Goal) {
@@ -378,7 +374,7 @@ export default function WizardContent({ meals }: { meals: Meal[] }) {
                   <span className="text-lg font-normal text-gray-500">/week</span>
                 </div>
                 <p className="text-base text-gray-500 mt-2">
-                  ~{formatPrice(avgPrice)} per meal avg — final price based on your picks
+                  {totalMeals > 0 ? formatPrice(flexibleWeekly / totalMeals) : "€0.00"} per meal avg — final price based on your picks
                 </p>
                 <ul className="mt-6 space-y-3 text-base text-gray-600">
                   <li className="flex items-center gap-2">

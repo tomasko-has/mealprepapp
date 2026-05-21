@@ -36,6 +36,20 @@ export function getSelectedMealsTotal(
   }, 0);
 }
 
+export type PlanPricing = Record<string, Record<number, number>>;
+
+export function getShopifyPlanPrice(
+  pricing: PlanPricing,
+  planType: "standard" | "flexible",
+  totalMeals: number
+): number | null {
+  const plan = pricing[planType];
+  if (!plan) return null;
+  const basePrice = plan[totalMeals];
+  if (basePrice === undefined) return null;
+  return planType === "standard" ? basePrice * (1 - STANDARD_DISCOUNT) : basePrice;
+}
+
 export function formatPrice(amount: number): string {
   return `€${amount.toFixed(2)}`;
 }
