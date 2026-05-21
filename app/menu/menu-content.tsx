@@ -40,7 +40,9 @@ export default function MenuContent({ meals }: { meals: Meal[] }) {
   const processedMeals = filterAndSortMeals(meals, selections);
   const targetMeals = getTargetMeals(selections);
   const totalSelected = Object.values(selectedMeals).reduce((sum, qty) => sum + qty, 0);
-  const totalPrice = getSelectedMealsTotal(processedMeals, selectedMeals);
+  const calculatedPrice = getSelectedMealsTotal(processedMeals, selectedMeals);
+  const flexibleWeekly = getShopifyPlanPrice(planPricing, "flexible", totalSelected);
+  const totalPrice = totalSelected === targetMeals && flexibleWeekly != null ? flexibleWeekly : calculatedPrice;
   const standardWeekly = getShopifyPlanPrice(planPricing, "standard", targetMeals) ?? 0;
 
   function addMeal(mealId: string) {

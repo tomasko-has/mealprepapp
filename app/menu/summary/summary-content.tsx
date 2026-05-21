@@ -152,7 +152,7 @@ export default function SummaryContent() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-gray-900 text-sm truncate">{meal.name}</h4>
-                  <span className="text-xs text-gray-500">x{quantity} · {formatPrice(meal.price * quantity)}</span>
+                  <span className="text-xs text-gray-500">x{quantity}</span>
                 </div>
               </div>
             ))}
