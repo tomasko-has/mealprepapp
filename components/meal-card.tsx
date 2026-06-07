@@ -20,11 +20,11 @@ export default function MealCard({
 }: MealCardProps) {
   const card = (
     <div
-      className={`bg-white rounded-2xl overflow-hidden border-2 transition-all hover:shadow-lg cursor-pointer ${
+      className={`bg-white rounded-2xl overflow-hidden border-2 transition-all hover:shadow-lg cursor-pointer flex flex-col h-full ${
         quantity > 0 ? "border-primary shadow-lg" : "border-gray-100"
       }`}
     >
-      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden shrink-0">
         {meal.image ? (
           <Image
             src={meal.image}
@@ -47,7 +47,7 @@ export default function MealCard({
           </div>
         )}
       </div>
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex items-baseline justify-between gap-2">
           <h3 className="font-bold text-gray-900 text-base">{meal.name}</h3>
           <span className="text-sm font-semibold text-primary shrink-0">
@@ -55,20 +55,21 @@ export default function MealCard({
           </span>
         </div>
         <p className="text-gray-500 text-sm mt-1 line-clamp-2">{meal.description}</p>
-        {meal.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {meal.tags.filter((tag) => !tag.startsWith("week-") && TAG_COLORS[tag]).map((tag) => (
-              <span
-                key={tag}
-                className={`px-2.5 py-1 rounded-full text-xs font-semibold ${TAG_COLORS[tag] || "bg-gray-100 text-gray-700"}`}
-              >
-                {formatTagLabel(tag)}
-              </span>
-            ))}
-          </div>
-        )}
-        {showSelect && (
-          <div className="flex items-center gap-2 mt-3">
+        <div className="mt-auto pt-3">
+          {meal.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {meal.tags.filter((tag) => !tag.startsWith("week-") && TAG_COLORS[tag]).map((tag) => (
+                <span
+                  key={tag}
+                  className={`px-2.5 py-1 rounded-full text-xs font-semibold ${TAG_COLORS[tag] || "bg-gray-100 text-gray-700"}`}
+                >
+                  {formatTagLabel(tag)}
+                </span>
+              ))}
+            </div>
+          )}
+          {showSelect && (
+            <div className="flex items-center gap-2 mt-3">
             {quantity > 0 ? (
               <>
                 <button
@@ -106,6 +107,7 @@ export default function MealCard({
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
