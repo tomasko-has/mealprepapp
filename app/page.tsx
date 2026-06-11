@@ -25,7 +25,7 @@ export default function Home() {
             href="/get-started"
             className="inline-block mt-8 bg-white text-primary px-8 py-3.5 rounded-full text-base font-semibold hover:bg-gray-100 transition-colors"
           >
-            Get Started — 20% Off First Week
+            Get Started — 20% Off in Standard Plan
           </Link>
         </div>
       </section>
