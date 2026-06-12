@@ -23,7 +23,7 @@ export default function PlanCards() {
           {/* Standard Plan */}
           <Link
             href="/get-started"
-            className="relative pt-12 p-10 rounded-3xl border-[3px] border-primary bg-primary-light/20 hover:shadow-xl transition-all group"
+            className="relative pt-16 p-10 rounded-3xl border-[3px] border-primary bg-primary-light/20 hover:shadow-xl transition-all group"
           >
             <span className="absolute top-5 left-10 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full">
               Recommended
