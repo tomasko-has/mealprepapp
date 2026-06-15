@@ -18,6 +18,8 @@ export default function Footer({ shopName = "ORA" }: { shopName?: string }) {
             <div className="flex flex-col gap-2 text-sm">
               <Link href="/menu" className="hover:text-white transition-colors">Our Menu</Link>
               <Link href="/get-started" className="hover:text-white transition-colors">Get Started</Link>
+              <Link href="/how-it-works" className="hover:text-white transition-colors">How it Works</Link>
+              <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
             </div>
           </div>
           <div>
