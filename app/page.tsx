@@ -3,6 +3,7 @@ import HowItWorks from "@/components/how-it-works";
 import MealPreview from "@/components/meal-preview";
 import PlanCards from "@/components/plan-cards";
 import Link from "next/link";
+import ChatWidget from "@/components/chat-widget";
 
 export default function Home() {
   return (
@@ -29,6 +30,8 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      <ChatWidget />
     </>
   );
 }
