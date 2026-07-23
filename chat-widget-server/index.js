@@ -2,11 +2,17 @@ const express = require("express");
 const path = require("path");
 require("dotenv").config();
 
+const { createCorsMiddleware } = require("./middleware/cors");
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Parse JSON bodies
 app.use(express.json());
+
+// CORS — allowlist only, no wildcard.
+// Approved origins are read from ALLOWED_ORIGINS in .env (comma-separated).
+app.use(createCorsMiddleware());
 
 // Serve widget.js as a static file
 app.use("/public", express.static(path.join(__dirname, "public")));
