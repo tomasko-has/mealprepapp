@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Widget — Config Test</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e2e8f0;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 { color: #059669; margin-bottom: 16px; }
+    p { line-height: 1.7; color: #94a3b8; margin-bottom: 12px; }
+    .card {
+      background: #1e1e2e;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    code {
+      background: #2a2a3e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat Widget — Per-Client Config Test</h1>
+
+  <div class="card">
+    <h2>Active Config</h2>
+    <p>Business: <code>Ora Nutrition</code></p>
+    <p>Accent: <code>#059669</code> (green)</p>
+    <p>Welcome: <code>Hi! I'm your nutrition assistant 🥗</code></p>
+  </div>
+
+  <div class="card">
+    <h2>Test Checklist</h2>
+    <p>1. Header shows "Ora Nutrition"? ✓/✗</p>
+    <p>2. Bubble is green (#059669)? ✓/✗</p>
+    <p>3. Welcome message matches data-welcome? ✓/✗</p>
+    <p>4. User messages have green background? ✓/✗</p>
+  </div>
+
+  <div class="card">
+    <h2>To test another config</h2>
+    <p>Change the <code>data-*</code> attributes below and refresh:</p>
+    <p><code>data-business</code> — name in header</p>
+    <p><code>data-accent</code> — bubble/header/message color</p>
+    <p><code>data-welcome</code> — first bot message</p>
+  </div>
+
+  <script src="http://localhost:3001/public/widget.js"
+    data-business="Ora Nutrition"
+    data-accent="#059669"
+    data-welcome="Hi! I'm your nutrition assistant. Ask me about meals, macros, or how to use the app 🥗">
+  </script>
+</body>
+</html>
