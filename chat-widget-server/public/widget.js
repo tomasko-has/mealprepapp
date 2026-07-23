@@ -1,11 +1,14 @@
 (function () {
   "use strict";
 
-  const scriptTag = document.currentScript;
+  const scriptTag = document.currentScript
+    || document.querySelector('script[src*="widget.js"]');
   const serverUrl = scriptTag.src.replace(/\/public\/widget\.js$/, "");
 
   const config = {
     business: scriptTag.getAttribute("data-business") || "Assistant",
+    businessKey: scriptTag.getAttribute("data-business-key")
+      || (scriptTag.getAttribute("data-business") || "default").toLowerCase().replace(/\s+/g, "-"),
     accent: scriptTag.getAttribute("data-accent") || "#6366f1",
     welcome: scriptTag.getAttribute("data-welcome") || "How can I help you today?",
   };
@@ -151,7 +154,7 @@
     </button>
     <div class="widget-panel">
       <div class="widget-header">
-        <span class="widget-header-title">${config.business}</span>
+        <span class="widget-header-title"></span>
         <button class="widget-header-close" aria-label="Close chat">&times;</button>
       </div>
       <div class="widget-messages"></div>
@@ -164,6 +167,8 @@
 
   shadow.appendChild(style);
   shadow.appendChild(container);
+
+  shadow.querySelector(".widget-header-title").textContent = config.business;
 
   // DOM references
   const bubble = shadow.querySelector(".widget-bubble");
@@ -304,7 +309,7 @@
       const response = await fetch(`${serverUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages, business: config.business }),
+        body: JSON.stringify({ messages, business: config.businessKey }),
       });
 
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
@@ -313,14 +318,17 @@
       const decoder = new TextDecoder();
       let firstChunk = true;
 
+      let buffer = "";
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const text = decoder.decode(value, { stream: true });
-        const lines = text.split("\n");
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n");
+        buffer = parts.pop(); // keep incomplete last line
 
-        for (const line of lines) {
+        for (const line of parts) {
           if (!line.startsWith("data: ")) continue;
           const data = line.slice(6);
           if (data === "[DONE]") continue;

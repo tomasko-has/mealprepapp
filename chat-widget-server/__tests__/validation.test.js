@@ -1,3 +1,5 @@
+process.env.ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:5500";
+
 const request = require("supertest");
 const { app } = require("../index");
 

@@ -20,7 +20,7 @@ Do not give medical advice — suggest consulting a healthcare provider for medi
 };
 
 function getSystemPrompt(business) {
-  return prompts[business] || prompts.default;
+  return Object.hasOwn(prompts, business) ? prompts[business] : prompts.default;
 }
 
 module.exports = { getSystemPrompt };

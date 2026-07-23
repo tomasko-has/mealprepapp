@@ -21,7 +21,7 @@ export default function ChatWidget({
       data-business={business}
       data-accent={accent}
       data-welcome={welcome}
-      strategy="lazyOnload"
+      strategy="afterInteractive"
     />
   );
 }
