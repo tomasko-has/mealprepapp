@@ -207,11 +207,56 @@
     if (e.key === "Escape" && isOpen) togglePanel();
   });
 
+  // Lightweight markdown parser
+  function renderMarkdown(text) {
+    let html = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Code blocks: ```...```
+    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+      return `<pre style="background:#1a1a2a;padding:10px;border-radius:6px;overflow-x:auto;margin:6px 0;font-size:13px;"><code>${code.trim()}</code></pre>`;
+    });
+
+    // Inline code: `...`
+    html = html.replace(/`([^`]+)`/g, (_, code) => {
+      return `<code style="background:#1a1a2a;padding:1px 5px;border-radius:3px;font-size:13px;">${code}</code>`;
+    });
+
+    // Bold: **...**
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+    // Italic: *...*
+    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+    // Unordered lists: - item or * item
+    html = html.replace(/^[*-] (.+)$/gm, (_, item) => {
+      return `<li style="margin-left:18px;list-style:disc;">${item}</li>`;
+    });
+
+    // Ordered lists: 1. item
+    html = html.replace(/^\d+\. (.+)$/gm, (_, item) => {
+      return `<li style="margin-left:18px;list-style:decimal;">${item}</li>`;
+    });
+
+    // Line breaks
+    html = html.replace(/\n/g, "<br>");
+
+    return html;
+  }
+
   // Append message to UI
   function appendMessage(role, content) {
     const msgEl = document.createElement("div");
     msgEl.className = `widget-msg ${role === "user" ? "user" : "bot"}`;
-    msgEl.textContent = content;
+
+    if (role === "user") {
+      msgEl.textContent = content;
+    } else {
+      msgEl.innerHTML = renderMarkdown(content);
+    }
+
     messagesEl.insertBefore(msgEl, typingEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return msgEl;
@@ -305,6 +350,10 @@
       fullResponse = "Sorry, something went wrong. Please try again.";
       botMsgEl.textContent = fullResponse;
     }
+
+    // Render final response with markdown
+    botMsgEl.innerHTML = renderMarkdown(fullResponse);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
 
     typingEl.classList.remove("visible");
     messages.push({ role: "assistant", content: fullResponse });
