@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Widget Test Page</title>
+  <title>Chat Widget — Config Test</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -21,27 +21,38 @@
       padding: 24px;
       margin: 20px 0;
     }
+    code {
+      background: #2a2a3e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
-  <h1>Ora Nutrition — Test Page</h1>
+  <h1>Chat Widget — Per-Client Config Test</h1>
+
   <div class="card">
-    <h2>Weekly Meal Prep</h2>
-    <p>This is a test page to verify the chat widget works correctly. The chat bubble should appear in the bottom-right corner.</p>
-    <p>Click the bubble to open the chat panel. Click X or press Escape to close it.</p>
+    <h2>Active Config</h2>
+    <p>Business: <code>Ora Nutrition</code></p>
+    <p>Accent: <code>#6366f1</code> (purple)</p>
+    <p>Welcome: <code>Hi! I'm your nutrition assistant 🥗</code></p>
   </div>
+
   <div class="card">
     <h2>Test Checklist</h2>
-    <p>1. Bubble visible in bottom-right? ✓/✗</p>
-    <p>2. Click bubble — panel opens with slide-up animation? ✓/✗</p>
-    <p>3. Click X — panel closes? ✓/✗</p>
-    <p>4. Press Escape — panel closes? ✓/✗</p>
-    <p>5. Bubble icon changes between chat and close? ✓/✗</p>
-    <p>6. Host page styles are NOT affected? ✓/✗</p>
-    <p>7. Welcome message appears on first open? ✓/✗</p>
-    <p>8. Can type and send messages? ✓/✗</p>
-    <p>9. Typing indicator shows while waiting? ✓/✗</p>
-    <p>10. Bot response streams in? ✓/✗</p>
+    <p>1. Header shows "Ora Nutrition"? ✓/✗</p>
+    <p>2. Bubble is purple (#6366f1)? ✓/✗</p>
+    <p>3. Welcome message matches data-welcome? ✓/✗</p>
+    <p>4. User messages have purple background? ✓/✗</p>
+  </div>
+
+  <div class="card">
+    <h2>To test another config</h2>
+    <p>Change the <code>data-*</code> attributes below and refresh:</p>
+    <p><code>data-business</code> — name in header</p>
+    <p><code>data-accent</code> — bubble/header/message color</p>
+    <p><code>data-welcome</code> — first bot message</p>
   </div>
 
   <script src="http://localhost:3001/public/widget.js"
