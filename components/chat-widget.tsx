@@ -10,7 +10,7 @@ interface ChatWidgetProps {
 }
 
 export default function ChatWidget({
-  serverUrl = "http://localhost:3001",
+  serverUrl = "https://mealprepapp-11vk.onrender.com",
   business = "Ora Nutrition",
   accent = "#059669",
   welcome = "Hi! I'm your nutrition assistant. Ask me about meals, macros, or how to use the app 🥗",
