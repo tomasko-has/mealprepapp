@@ -12,7 +12,7 @@ interface ChatWidgetProps {
 export default function ChatWidget({
   serverUrl = "http://localhost:3001",
   business = "Ora Nutrition",
-  accent = "#6366f1",
+  accent = "#059669",
   welcome = "Hi! I'm your nutrition assistant. Ask me about meals, macros, or how to use the app 🥗",
 }: ChatWidgetProps) {
   return (
