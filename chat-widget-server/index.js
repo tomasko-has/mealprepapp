@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const { createCorsMiddleware } = require("./middleware/cors");
+const { handleChat } = require("./routes/chat");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -62,10 +63,8 @@ function validateChatInput(req, res, next) {
   next();
 }
 
-// Chat endpoint (streaming response added in Task 4)
-app.post("/api/chat", chatLimiter, validateChatInput, (req, res) => {
-  res.json({ message: "stub — streaming added in next task" });
-});
+// Chat endpoint — streams Claude API responses via SSE
+app.post("/api/chat", chatLimiter, validateChatInput, handleChat);
 
 // Only start listening if this file is run directly (not imported by tests)
 if (require.main === module) {
