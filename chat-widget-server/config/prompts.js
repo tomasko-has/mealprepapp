@@ -20,7 +20,8 @@ Do not give medical advice — suggest consulting a healthcare provider for medi
 };
 
 function getSystemPrompt(business) {
-  return Object.hasOwn(prompts, business) ? prompts[business] : prompts.default;
+  const key = business.toLowerCase().replace(/\s+/g, "-");
+  return Object.hasOwn(prompts, key) ? prompts[key] : prompts.default;
 }
 
 module.exports = { getSystemPrompt };
