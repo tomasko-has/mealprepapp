@@ -19,7 +19,7 @@ export default function StudioPage() {
       ) : (
         <p style={{ padding: 32, fontFamily: "sans-serif" }}>
           Sanity is not configured. Set NEXT_PUBLIC_SANITY_PROJECT_ID and NEXT_PUBLIC_SANITY_DATASET in
-          .env.local (see .env.example) and restart the dev server.
+          .env.local (see docs/sanity.md) and restart the dev server.
         </p>
       )}
     </div>

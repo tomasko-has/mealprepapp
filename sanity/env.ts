@@ -1,5 +1,5 @@
 // Shared Sanity settings for the Studio, the CLI, the Next.js client and the import script.
-// Values come from .env.local (see .env.example). We don't throw when they're missing so that
+// Values come from .env.local (see docs/sanity.md). We don't throw when they're missing so that
 // `next build` still works on machines without Sanity configured; callers check `isSanityConfigured`.
 
 export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "";
