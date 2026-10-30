@@ -57,7 +57,7 @@ export default async function OrderConfirmationPage({
           <h1 className="text-3xl font-bold text-gray-900 mb-3">Thank you for your order!</h1>
           <p className="text-gray-600 mb-6">
             {session.customer_details?.email
-              ? <>A confirmation was sent to <span className="font-semibold text-gray-900">{session.customer_details.email}</span>.</>
+              ? <>Your order for <span className="font-semibold text-gray-900">{session.customer_details.email}</span> is confirmed.</>
               : "Your payment was successful."}
           </p>
           {session.amount_total != null && (
