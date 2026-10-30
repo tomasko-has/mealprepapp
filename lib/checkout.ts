@@ -127,6 +127,28 @@ function encodeLines(prefix: string, lines: CartLine[]): Record<string, string> 
   return Object.fromEntries(chunks.map((chunk, i) => [`${prefix}_${i}`, chunk]));
 }
 
+function decodeLines(prefix: string, metadata: Record<string, string>): { id: string; quantity: number }[] {
+  const chunks: string[] = [];
+  for (let i = 0; metadata[`${prefix}_${i}`]; i++) chunks.push(metadata[`${prefix}_${i}`]);
+  return chunks
+    .flatMap((chunk) => chunk.split(","))
+    .map((part) => {
+      const [id, quantity] = part.split(":");
+      return { id, quantity: Number(quantity) };
+    });
+}
+
+/** Reads the order back from Checkout Session or Subscription metadata (used by the webhook). */
+export function decodeOrderMetadata(metadata: Record<string, string>) {
+  return {
+    planType: metadata.planType,
+    mealsPerDay: Number(metadata.mealsPerDay),
+    daysPerWeek: Number(metadata.daysPerWeek),
+    meals: decodeLines("meals", metadata),
+    addOns: decodeLines("addOns", metadata),
+  };
+}
+
 function buildMetadata(cart: Cart): Record<string, string> {
   return {
     planType: cart.planType,
