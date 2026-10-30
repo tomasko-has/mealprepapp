@@ -17,7 +17,8 @@ export async function POST(request: Request) {
 
     const origin = new URL(request.url).origin;
     const session = await createCheckoutSession(cart, {
-      mode: "payment",
+      // Meal plans are weekly subscriptions (see the disclaimer on the summary page)
+      mode: "subscription",
       // Stripe replaces {CHECKOUT_SESSION_ID} with the real session id
       successUrl: `${origin}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/menu/summary?canceled=1`,

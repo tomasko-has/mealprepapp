@@ -22,3 +22,22 @@ export function getStripe(): Stripe {
   stripeClient = new Stripe(secretKey);
   return stripeClient;
 }
+
+/**
+ * Creates a Stripe Customer Portal session where the customer can update their card
+ * or cancel the subscription. Returns the URL to redirect to.
+ *
+ * Not wired to any page yet — the account page will call this once auth knows the
+ * logged-in user's Stripe customer id. Never accept the customer id from the browser.
+ * Requires the portal to be activated once in the Dashboard (Settings → Billing → Customer portal).
+ */
+export async function createCustomerPortalSession(
+  customerId: string,
+  returnUrl: string
+): Promise<string> {
+  const session = await getStripe().billingPortal.sessions.create({
+    customer: customerId,
+    return_url: returnUrl,
+  });
+  return session.url;
+}
