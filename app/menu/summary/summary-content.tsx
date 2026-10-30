@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { loadOrderData, type OrderData } from "@/lib/order-storage";
-import { loadWizardSelections, clearWizardSelections } from "@/lib/wizard-storage";
-import { formatPrice, STANDARD_DISCOUNT, type PlanPricing } from "@/lib/pricing";
+import { calculateOrderTotals, formatCents, formatPrice, STANDARD_DISCOUNT, toCents } from "@/lib/pricing";
 
 export default function SummaryContent() {
   const router = useRouter();
+  const wasCanceled = useSearchParams().get("canceled") === "1";
   const [order, setOrder] = useState<OrderData | null>(null);
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [planPricing, setPlanPricing] = useState<PlanPricing>({});
 
   useEffect(() => {
     const data = loadOrderData();
@@ -22,10 +21,6 @@ export default function SummaryContent() {
       return;
     }
     setOrder(data);
-    fetch("/api/plans")
-      .then((res) => res.json())
-      .then(setPlanPricing)
-      .catch(() => {});
   }, [router]);
 
   if (!order) {
@@ -34,53 +29,53 @@ export default function SummaryContent() {
 
   const totalMeals = order.selectedMeals.reduce((sum, { quantity }) => sum + quantity, 0);
 
-  // Use Shopify fixed variant price when available, fall back to calculated
-  const planType = order.planType as "standard" | "flexible";
-  const shopifyBase = planPricing[planType]?.[totalMeals];
-  const mealsSubtotal = shopifyBase ?? order.selectedMeals.reduce(
-    (sum, { meal, quantity }) => sum + meal.price * quantity,
-    0
+  // Same calculation the server uses for Stripe (display only — the server re-prices everything)
+  const toLine = ({ meal, quantity }: OrderData["selectedMeals"][number]) => ({
+    unitAmount: toCents(meal.price),
+    quantity,
+  });
+  const totals = calculateOrderTotals(
+    order.planType,
+    order.selectedMeals.map(toLine),
+    order.selectedAddOns.map(toLine)
   );
-  const discount = order.planType === "standard" ? mealsSubtotal * STANDARD_DISCOUNT : 0;
-  const mealsTotal = mealsSubtotal - discount;
-
-  const addOnsTotal = order.selectedAddOns.reduce(
-    (sum, { meal, quantity }) => sum + meal.price * quantity,
-    0
-  );
-
-  const orderTotal = mealsTotal + addOnsTotal;
   const totalAddOns = order.selectedAddOns.reduce((sum, { quantity }) => sum + quantity, 0);
 
   async function handleCheckout() {
-    if (!disclaimerChecked || isLoading) return;
+    if (!order || !disclaimerChecked || isLoading) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const wizard = loadWizardSelections();
+      // Only ids and quantities are sent — the server looks up the prices itself
+      const toItem = ({ meal, quantity }: OrderData["selectedMeals"][number]) => ({
+        id: meal.id,
+        quantity,
+      });
 
-      const res = await fetch("/api/cart", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...order,
-          goals: wizard?.goals,
-          avoid: wizard?.avoid,
+          planType: order.planType,
+          mealsPerDay: order.mealsPerDay,
+          daysPerWeek: order.daysPerWeek,
+          meals: order.selectedMeals.map(toItem),
+          addOns: order.selectedAddOns.map(toItem),
         }),
       });
 
       const data = await res.json();
 
-      if (!res.ok || !data.checkoutUrl) {
-        setError(data.error || "Failed to create cart. Please try again.");
+      if (!res.ok || !data.url) {
+        setError(data.error || "Failed to start checkout. Please try again.");
         setIsLoading(false);
         return;
       }
 
-      clearWizardSelections();
-      window.location.href = data.checkoutUrl;
+      // Order data is cleared on /order-confirmation, so a canceled payment keeps the cart
+      window.location.href = data.url;
     } catch {
       setError("Something went wrong. Please try again.");
       setIsLoading(false);
@@ -98,6 +93,14 @@ export default function SummaryContent() {
             Review your weekly plan before checkout
           </p>
         </div>
+
+        {wasCanceled && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4">
+            <p className="text-sm text-amber-800">
+              Payment was canceled — nothing was charged. Your order is still here.
+            </p>
+          </div>
+        )}
 
         {/* Plan Info */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-4">
@@ -199,23 +202,23 @@ export default function SummaryContent() {
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">Meals subtotal ({totalMeals} items)</span>
-              <span className="text-gray-900">{formatPrice(mealsSubtotal)}</span>
+              <span className="text-gray-900">{formatCents(totals.mealsSubtotal)}</span>
             </div>
-            {discount > 0 && (
+            {totals.discount > 0 && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-primary font-medium">Standard discount ({Math.round(STANDARD_DISCOUNT * 100)}%)</span>
-                <span className="text-primary font-medium">-{formatPrice(discount)}</span>
+                <span className="text-primary font-medium">-{formatCents(totals.discount)}</span>
               </div>
             )}
-            {addOnsTotal > 0 && (
+            {totals.addOnsTotal > 0 && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Add-ons ({totalAddOns} items)</span>
-                <span className="text-gray-900">{formatPrice(addOnsTotal)}</span>
+                <span className="text-gray-900">{formatCents(totals.addOnsTotal)}</span>
               </div>
             )}
             <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
               <span className="text-base font-bold text-gray-900">Weekly total</span>
-              <span className="text-xl font-bold text-gray-900">{formatPrice(orderTotal)}</span>
+              <span className="text-xl font-bold text-gray-900">{formatCents(totals.total)}</span>
             </div>
           </div>
         </div>
