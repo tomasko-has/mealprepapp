@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "How It Works",
+  description: "Tell us your goals, pick your meals, and get fresh meal prep delivered to your door. Here's how ORA Nutrition works.",
+};
 
 const STEPS = [
   {
