@@ -11,7 +11,11 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ORA Nutrition | Fresh Meal Prep Delivered",
+  // Subpages set only their own title; the template appends the brand name
+  title: {
+    template: "%s | ORA Nutrition",
+    default: "ORA Nutrition | Fresh Meal Prep Delivered",
+  },
   description: "Chef-prepared, macro-balanced meals delivered to your door. Choose your plan and fuel your goals.",
 };
 

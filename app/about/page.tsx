@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: "Meet ORA Nutrition — chef-prepared, macro-balanced meals made to take the stress out of eating well.",
+};
 
 export default function AboutPage() {
   return (
