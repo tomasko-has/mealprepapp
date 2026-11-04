@@ -30,7 +30,11 @@ Stripe posiela udalosti (napr. „platba dokončená“) na `/api/webhook`. Na l
    winget install Stripe.StripeCLI
    ```
 
-   Potom zatvor a znova otvor terminál.
+   Potom zatvor a znova otvor terminál. Ak `stripe` stále nie je rozpoznaný príkaz (winget niekedy nepridá PATH), spúšťaj ho celou cestou:
+
+   ```powershell
+   & "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Stripe.StripeCli_Microsoft.Winget.Source_8wekyb3d8bbwe\stripe.exe" login
+   ```
 
 2. Prihlás CLI k účtu (otvorí prehliadač):
 
@@ -38,10 +42,10 @@ Stripe posiela udalosti (napr. „platba dokončená“) na `/api/webhook`. Na l
    stripe login
    ```
 
-3. V **samostatnom** termináli spusti preposielanie:
+3. V **samostatnom** termináli spusti preposielanie. Novšie verzie CLI vyžadujú zoznam udalostí cez `--events`:
 
    ```powershell
-   stripe listen --forward-to localhost:3000/api/webhook
+   stripe listen --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.paid,invoice.payment_failed --forward-to localhost:3000/api/webhook
    ```
 
    Vypíše `Your webhook signing secret is whsec_...` – tento kľúč daj do `.env.local` ako `STRIPE_WEBHOOK_SECRET` a reštartuj `npm run dev`. Terminál so `stripe listen` nechaj bežať.
