@@ -1,4 +1,5 @@
 import type { Meal } from "./types";
+import { clearWizardSelections } from "./wizard-storage";
 
 export interface OrderData {
   planType: "standard" | "flexible";
@@ -13,6 +14,13 @@ const ORDER_KEY = "orderData";
 export function saveOrderData(data: OrderData): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(ORDER_KEY, JSON.stringify(data));
+}
+
+/** Removes everything the order flow keeps in localStorage. Call after a successful checkout. */
+export function clearOrderData(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(ORDER_KEY);
+  clearWizardSelections();
 }
 
 export function loadOrderData(): OrderData | null {
