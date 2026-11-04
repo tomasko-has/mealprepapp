@@ -119,7 +119,11 @@ function getClient(): SanityClient | null {
 }
 
 const client = getClient();
+// In a dry run the client (if configured) is only used to read what already exists.
+const writer = dryRun ? null : client;
 const summary: string[] = [];
+const report = (label: string, created: number, total: number) =>
+  summary.push(`${label}: ${created} ${dryRun ? "would be created" : "created"}, ${total - created} already existed`);
 
 /** Map of key -> existing document _id (published or draft) for one document type. */
 async function existingIds(type: string, keyExpr: string): Promise<Map<string, string>> {
@@ -148,31 +152,26 @@ async function upsertByKey(
   let created = 0;
   for (const { key, doc } of docs) {
     if (ids.has(key)) continue;
-    if (client) {
-      const result = await client.create({ _type: type, ...doc });
+    if (writer) {
+      const result = await writer.create({ _type: type, ...doc });
       ids.set(key, result._id);
     } else {
       ids.set(key, `dry-run.${type}.${key}`);
     }
     created++;
   }
-  summary.push(`${type}: ${created} created, ${docs.length - created} already existed`);
+  report(type, created, docs.length);
   return ids;
 }
 
 async function createSingletons(docs: { _id: string; _type: string }[]) {
   let created = 0;
   for (const doc of docs) {
-    if (!client) {
-      created++;
-      continue;
-    }
-    const before = await client.getDocument(doc._id);
-    if (before) continue;
-    await client.createIfNotExists(doc);
+    if (client && (await client.getDocument(doc._id))) continue;
+    await writer?.createIfNotExists(doc);
     created++;
   }
-  summary.push(`singletons: ${created} created, ${docs.length - created} already existed`);
+  report("singletons", created, docs.length);
 }
 
 // --- Import ---------------------------------------------------------------------------------
