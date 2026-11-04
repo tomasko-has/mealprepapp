@@ -1,0 +1,13 @@
+Handle,Title,Body (HTML),Vendor,Tags,Published,Option1 Name,Option1 Value,Variant Price,Image Src
+grilled-chicken-rice-bowl,Grilled Chicken & Rice Bowl,"Tender grilled chicken breast served with jasmine rice, roasted vegetables, and a light herb sauce.",ORANutrition,"High Protein, Healthy",TRUE,Title,Default Title,12.99,
+teriyaki-salmon,Teriyaki Salmon,"Oven-baked salmon fillet glazed with house-made teriyaki sauce, served with steamed brown rice and stir-fried bok choy.",ORANutrition,"High Protein, Healthy",TRUE,Title,Default Title,14.99,
+beef-steak-sweet-potato,Beef Steak & Sweet Potato,"Juicy seasoned beef steak with roasted sweet potato wedges and sautéed green beans in garlic butter.",ORANutrition,"High Protein, Low Carb",TRUE,Title,Default Title,15.99,
+turkey-meatballs-pasta,Turkey Meatballs & Pasta,"Lean turkey meatballs in a rich tomato basil sauce over whole wheat penne pasta with parmesan.",ORANutrition,"Calorie Smart, Healthy",TRUE,Title,Default Title,11.99,
+lemon-herb-chicken,Lemon Herb Chicken,"Lemon and herb marinated chicken thigh with roasted Mediterranean vegetables and quinoa.",ORANutrition,"High Protein, Gluten Free",TRUE,Title,Default Title,12.99,
+shrimp-stir-fry,Shrimp Stir Fry,"Garlic butter shrimp with colorful bell peppers, snap peas, and cauliflower rice in a ginger soy glaze.",ORANutrition,"Low Carb, Keto, Gluten Free",TRUE,Title,Default Title,14.99,
+chicken-fajita-bowl,Chicken Fajita Bowl,"Spiced chicken strips with grilled peppers and onions, cilantro lime rice, black beans, and fresh salsa.",ORANutrition,"High Protein, Healthy",TRUE,Title,Default Title,12.99,
+salmon-asparagus,Salmon & Asparagus,"Pan-seared salmon with roasted asparagus, cherry tomatoes, and a creamy dill sauce over wild rice.",ORANutrition,"High Protein, Keto, Gluten Free",TRUE,Title,Default Title,15.99,
+bbq-pulled-chicken,BBQ Pulled Chicken,"Slow-cooked pulled chicken in smoky BBQ sauce with coleslaw and cornbread on the side.",ORANutrition,"Calorie Smart, Healthy",TRUE,Title,Default Title,11.99,
+greek-chicken-bowl,Greek Chicken Bowl,"Grilled chicken with cucumber, tomatoes, red onion, feta cheese, and tzatziki over fluffy couscous.",ORANutrition,"High Protein, Healthy",TRUE,Title,Default Title,12.99,
+keto-burger-bowl,Keto Burger Bowl,"Seasoned ground beef with cheddar, pickles, lettuce, tomato, and special sauce over a bed of mixed greens.",ORANutrition,"Keto, Low Carb, Gluten Free",TRUE,Title,Default Title,13.99,
+chicken-tikka-masala,Chicken Tikka Masala,"Tender chicken pieces in a creamy spiced tikka masala sauce with basmati rice and warm naan bread.",ORANutrition,"Calorie Smart, Healthy",TRUE,Title,Default Title,12.99,
