@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
+import { getSession } from "@/lib/dal";
+import { logout } from "@/app/actions/auth";
 import LogoLink from "./logo-link";
 
 export default async function Navbar({ shopName = "ORA" }: { shopName?: string }) {
-  const cookieStore = await cookies();
-  const isLoggedIn = !!cookieStore.get("shop_access_token")?.value ||
-    !!cookieStore.get("shop_refresh_token")?.value;
+  const isLoggedIn = !!(await getSession());
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-y border-gray-200">
@@ -35,17 +34,19 @@ export default async function Navbar({ shopName = "ORA" }: { shopName?: string }
                 >
                   My Account
                 </Link>
-                <a
-                  href="/api/auth/logout"
-                  className="text-sm text-gray-500 hover:text-gray-700 font-medium"
-                >
-                  Logout
-                </a>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="text-sm text-gray-500 hover:text-gray-700 font-medium cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                </form>
               </>
             ) : (
               <>
                 <Link
-                  href="/api/auth/login"
+                  href="/login"
                   className="border border-gray-300 text-gray-700 px-5 py-2 rounded-full text-sm font-semibold hover:border-gray-400 transition-colors"
                 >
                   Login
